@@ -1,0 +1,56 @@
+﻿@page "/admin/categorylist"
+@using FoodSiteMAUI.Data.Services.Abstract;
+@using Entities.Concrete;
+@using FoodSiteMAUI.Data;
+@inject ICategoryService _categoryService;
+
+<p style="bottom:5px"></p>
+@if (list == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MudContainer Class="d-flex justify-end flex-grow-1 gap-4" Elevation="0">
+        <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" Href="/userItem" />
+    </MudContainer>
+    <MudSimpleTable Hover="true" Dense="true" FixedHeader="@fixedheader" Style="@(fixedheader?"height:300px;":"")">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Kategori Adı</th>
+                <th>Image</th>
+                <th>Durumlar</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in list)
+            {
+                <tr> 
+                    <td>@item.Id</td>
+                    <td>@item.CategoryName</td>
+                    <td><MudImage Image="@item.Image" Height="50" Width="50"/></td>
+                    <td>
+                        <MudFab Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Edit" />
+                        <MudFab Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Delete" />
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+
+    <MudSwitch @bind-Checked="@fixedheader">Fixed Header</MudSwitch>
+}
+
+@code {
+    bool fixedheader = false;
+    private List<Category> list;
+
+    protected override async Task OnInitializedAsync()
+    {
+      list= await  _categoryService.GetAll();
+    }
+
+
+
+}

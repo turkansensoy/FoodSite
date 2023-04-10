@@ -1,0 +1,62 @@
+﻿@page "/senderRecipe"
+@using Entities.Concrete;
+@using FoodSiteMAUI.Data.Services.Abstract;
+
+@inject IRecipeService _recipeService;
+@inject NavigationManager NavigatonManager;
+<br />
+<MudItem>
+    <MudCard style="box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;">
+        <MudCardActions Class="d-flex align-start flex-grow-1 gap-4" Elevation="0">
+            <MudButton Href="/recipeForm" Variant="Variant.Filled" Class="py-2 d-flex flex-1" StartIcon="@Icons.Material.Filled.Add" Style="@($"color:{Colors.Grey.Lighten5}; background:{Colors.Blue.Lighten3};")">Tarif Gönder</MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudItem>
+<br />
+<MudDivider Class="my-2" />
+<br />
+
+@if(listRecipe == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    @foreach (var item in listRecipe)
+    {
+
+        <MudItem>
+            <MudCard style="box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">@item.RecipeName</MudText>
+                    <MudText Typo="Typo.subtitle2" Style="@($"color:{Colors.Red.Darken1};")">Taslak Tarif</MudText>
+                </MudCardHeader>
+                <MudDivider Class="my-2" />
+                <MudCardActions Class="d-flex align-start flex-grow-1 gap-4" Elevation="0">                 
+                    <MudButton Variant="Variant.Filled" Class="py-2 d-flex flex-1" StartIcon="@Icons.Material.Filled.Edit" Href="@($"/recipeUpdate/{@item.Id}")">Taslağı Düzenle</MudButton>
+                    <MudButton Variant="Variant.Filled" Class="py-2 d-flex flex-1" StartIcon="@Icons.Material.Filled.Edit" Style="@($"color:{Colors.Grey.Lighten5}; background:{Colors.BlueGrey.Lighten1};")" OnClick="()=>SendItem(item.Id)">Yayına Gönder</MudButton>
+                    <MudButton Variant="Variant.Filled" Class="py-2 d-flex flex-1" StartIcon="@Icons.Material.Filled.Delete" Style="@($"color:{Colors.Grey.Lighten5}; background:{Colors.Red.Darken1};")" OnClick="()=>DeleteItem(item.Id)">Taslağı Sil</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <br />
+    }
+}
+@code {
+    private List<Recipe> listRecipe;
+
+    protected override async Task OnInitializedAsync()
+    {
+        listRecipe = await _recipeService.GetAll();
+    }
+    private void DeleteItem(int id)
+    {
+        _recipeService.Delete(id);
+        NavigatonManager.NavigateTo("/senderRecipe", forceLoad: true);
+    }
+    public void SendItem(int id)
+    {
+        var recipeItem= _recipeService.GetById(id);
+         
+    }
+}
