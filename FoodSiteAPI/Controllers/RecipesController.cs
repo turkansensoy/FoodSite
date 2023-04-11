@@ -73,7 +73,7 @@ namespace FoodSiteAPI.Controllers
                 return BadRequest();
             }
             var result = _recipeService.Update(recipe);
-            return Ok(result);
+            return Ok(recipe);
         }
 
         [HttpDelete("{id:int}")]
@@ -82,6 +82,13 @@ namespace FoodSiteAPI.Controllers
             var recipe = _recipeService.GetById(id);
             var deletedRecipe = _recipeService.Delete(recipe);
             return Ok(deletedRecipe);
+        }
+        [HttpGet("{id:int}")]
+        public IActionResult GetById([FromRoute(Name ="id")] int id)
+        {
+            var recipe= _recipeService.GetById(id);
+            return Ok(recipe);
+
         }
     }
 

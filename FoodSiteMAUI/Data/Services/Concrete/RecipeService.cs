@@ -40,14 +40,18 @@ namespace FoodSiteMAUI.Data.Services.Concrete
             return JsonConvert.DeserializeObject<List<Recipe>>(stringContent);
         }
 
-        public Task<Recipe> GetById(int id)
+        public async Task<Recipe> GetById(int id)
         {
-            throw new NotImplementedException();
+            var response= await _httpClient.GetAsync($"api/Recipes/{id}");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<Recipe>();
         }
 
-        public Task<Recipe> Update(Recipe recipes)
+        public async Task<Recipe> Update(Recipe recipes)
         {
-            throw new NotImplementedException();
+          var responseMessage = await  _httpClient.PutAsJsonAsync("api/Recipes", recipes);
+            responseMessage.EnsureSuccessStatusCode();
+            return await responseMessage.Content.ReadFromJsonAsync<Recipe>();
         }
     }
 }
