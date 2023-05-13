@@ -9,7 +9,6 @@ namespace Business.ValidationRules.FluentValidation
         {
             RuleFor(r=>r.RecipeName).NotEmpty().WithMessage("Tarif Adı Boş geçilmemezi.");
             RuleFor(r=>r.RecipeContent).NotEmpty().WithMessage("Tarif boş geçilemez.");
-            RuleFor(r=>r.Materials).NotEmpty().WithMessage("Malzemeler boş geçilemez.");
             RuleFor(r=>r.NumberofPerson).NotEmpty().WithMessage("Kaç kişilik olduğu boş geçilemez.");
             RuleFor(r=>r.NumberofPerson).NotEmpty().GreaterThan(1).LessThan(50).WithMessage("1-50 arasında kişi sayısı giriniz.");
             RuleFor(r => r.PreparationTime).NotEmpty().WithMessage("Hazırlanma süresi boş geçilemez.");

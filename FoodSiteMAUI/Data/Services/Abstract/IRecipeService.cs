@@ -1,4 +1,5 @@
 ﻿using Entities.Concrete;
+using Entities.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,13 @@ namespace FoodSiteMAUI.Data.Services.Abstract
 {
     public interface IRecipeService
     {
-        Task<List<Recipe>> GetAll();
-        Task<Recipe> Add(Recipe recipes);
-        Task<Recipe> Update(Recipe recipes);
+        Task<List<RecipeDto>> GetAll();
+        Task<Recipe> Add(RecipeMaterialAddDto  recipeMaterialAddDto);
+        Task<RecipeDto> Update(RecipeDto recipes);
         void Delete(int id);
         Task<Recipe> GetById(int id);
+        Task<List<RecipeEngineDto>> GetRecipeEngineDtos(string materialName);
+        Task<List<RecipeEngineDto>> GetAllRecipeEngine();
     }
+
 }

@@ -2,18 +2,30 @@
 @using FoodSiteMAUI.Data.Services.Abstract;
 @using Entities.Concrete;
 @using FoodSiteMAUI.Data;
-@inject ICategoryService _categoryService;
 
-<p style="bottom:5px"></p>
+@inject ICategoryService _categoryService;
+@inject NavigationManager NavigatonManager;
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+<MudDivider Class="my-1" />
+<br />
+<MudGrid>
+    <MudItem sm="6" md="4">
+        <MudText Typo="Typo.h5">Kategoriler</MudText>
+    </MudItem>
+</MudGrid>
+<br />
 @if (list == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <MudContainer Class="d-flex justify-end flex-grow-1 gap-4" Elevation="0">
-        <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add" Href="/userItem" />
-    </MudContainer>
+    <MudItem>
+        <div Class="d-flex justify-end">
+            <MudFab Color="Color.Primary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Add"/>
+        </div>
+    </MudItem>
+    <br/>
     <MudSimpleTable Hover="true" Dense="true" FixedHeader="@fixedheader" Style="@(fixedheader?"height:300px;":"")">
         <thead>
             <tr>
@@ -29,10 +41,10 @@ else
                 <tr> 
                     <td>@item.Id</td>
                     <td>@item.CategoryName</td>
-                    <td><MudImage Image="@item.Image" Height="50" Width="50"/></td>
+                    <td><MudImage Src="@($"https://localhost:7018/{@item.Image}")" Height="50" Width="50" /></td>
                     <td>
-                        <MudFab Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Edit" />
-                        <MudFab Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Delete" />
+                        <MudFab Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Edit" Href="@($"/admin/updateCategoryList/{@item.Id}")" />
+                        <MudFab Color="Color.Secondary" Size="Size.Small" StartIcon="@Icons.Material.Filled.Delete" OnClick="()=>DeleteItem(item.Id)" />
                     </td>
                 </tr>
             }
@@ -43,14 +55,22 @@ else
 }
 
 @code {
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Home", href: "#", icon: Icons.Material.Filled.Home),
+        new BreadcrumbItem("Videos", href: "#", icon: Icons.Material.Filled.VideoLibrary),
+        new BreadcrumbItem("Create", href: null, disabled: true, icon: Icons.Material.Filled.Create)
+    };
     bool fixedheader = false;
     private List<Category> list;
 
     protected override async Task OnInitializedAsync()
     {
-      list= await  _categoryService.GetAll();
+        list= await  _categoryService.GetAll();
     }
-
-
-
+    private void DeleteItem(int id)
+    {
+        _categoryService.Delete(id);  
+        NavigatonManager.NavigateTo("/admin/categorylist", forceLoad: true);
+    }
 }

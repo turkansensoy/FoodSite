@@ -25,6 +25,9 @@ namespace FoodSiteMAUI
             builder.Services.AddMudServices();
             builder.Services.AddSingleton<IRecipeService, RecipeService>();
             builder.Services.AddSingleton<ICategoryService, CategoryService>();
+            builder.Services.AddSingleton<IMaterialService, MaterialService>();
+            builder.Services.AddSingleton<IRecipeMaterialService, RecipeMaterialService>();
+
             builder.Services.AddSingleton(_ => new HttpClient { BaseAddress = new Uri("https://localhost:7018/") });
             return builder.Build();
         }

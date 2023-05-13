@@ -1,0 +1,158 @@
+﻿@page "/recipeMaterialForm"
+@using Entities.Enums;
+@using FoodSiteMAUI.Data.Services.Abstract;
+
+@inject ICategoryService _categoryService;
+@inject IMaterialService _materialService;
+@inject IRecipeService _recipeService;
+@inject NavigationManager NavigatonManager;
+
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+<MudDivider Class="my-1" />
+<br />
+<MudGrid>
+    <MudItem sm="6" md="4">
+        <MudText Typo="Typo.h5">Tarif Bilgisi</MudText>
+    </MudItem>
+</MudGrid>
+<br />
+<MudContainer>
+    <MudCard>
+        <MudForm Model="@model" @ref="@form">
+            <MudCardContent>
+
+                <MudTextField @bind-Value="model.UserName"
+                              Label="User Name" />
+                <MudTextField @bind-Value="model.UserEmail"
+                              Label="User Email" />
+
+                <MudTextField @bind-Value="model.RecipeName"
+                              Label="Tarif adı"
+                              For="@(()=>model.RecipeName)"
+                              Immediate="true" />
+                <br />
+                <MudSelect Label="Kategori" @bind-Value="model.CategoryId" For="@(()=>model.CategoryId)">
+                    @if (categorynameselect != null)
+                    {
+                        @foreach (var item in categorynameselect)
+                        {
+                            <MudSelectItem Value="item.Id">@item.CategoryName</MudSelectItem>
+                        }
+                    }
+                </MudSelect>
+                <br /><br />
+                <MudGrid Class="d-flex align-start flex-grow-1 gap-4" Elevation="0">
+                    <MudItem Class="py-2 d-flex flex-1" sm="6">
+                        <MudNumericField Label="Kaç Kişilik"
+                                         @bind-Value="model.NumberofPerson"
+                                         For="@(()=>model.NumberofPerson)" />
+                    </MudItem>
+                    <MudItem Class="py-2 d-flex flex-1" sm="6">
+                        <MudNumericField @bind-Value="model.PreparationTime"
+                                         Label="Hazırlanma Süresi"
+                                         For="@(()=>model.PreparationTime)" />
+                    </MudItem>
+                    <MudItem Class="py-2 d-flex flex-1" sm="6">
+                        <MudNumericField @bind-Value="model.CookingTime"
+                                         Label="Pişirme Süresi"
+                                         For="@(()=>model.CookingTime)" />
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+        </MudForm>
+    </MudCard>
+</MudContainer>
+<br />
+<MudContainer>
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Malzemeleri Ekleme</MudText>
+        </MudCardHeader>
+        <MudCardContent Class="pa-3">
+            <MudForm Model="multiSelectMaterial">
+                <MudGrid Class="d-flex align-start flex-grow-1 gap-4" Elevation="0">
+                    <MudItem Class="py-2 d-flex flex-1" sm="6">
+                        <MudNumericField HideSpinButtons="true" @bind-Value="multiSelectMaterial.MaterialNumber" Label="Miktar" Variant="Variant.Text" Min="0" Max="10" />
+                    </MudItem>
+                    <MudItem Class="py-2 d-flex flex-1" sm="6">
+                        <MudSelect Label="Ölçü" @bind-Value="multiSelectMaterial.Guantity">
+                            @foreach (Guantity item in Enum.GetValues(typeof(Guantity)))
+                            {
+                                <MudSelectItem Value="@item">@GetDisplayText(item)</MudSelectItem>
+
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem Class="py-2 d-flex flex-1" sm="6">
+                        <MudAutocomplete T="string" Label="Malzemeler" @bind-Value="multiSelectMaterial.MaterialName" SearchFunc="@Search1"
+                                         AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="Color.Primary" Clearable />
+                    </MudItem>
+                </MudGrid>
+            </MudForm>
+            <br/>
+            @if (ListMultiSelectMaterial != null)
+            {
+                <MudSimpleTable Hover="true" Dense="true">
+                    <thead>
+                        <tr>
+                            <th>Miktar</th>
+                            <th>Ölçü</th>
+                            <th>Malzeme</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in ListMultiSelectMaterial)
+                        {
+                            <tr>
+                                <td>@item.MaterialNumber</td>
+                                <td>@item.Guantity</td>
+                                <td>@item.MaterialName</td>
+                                <td>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="()=> DeleteItemMaterial(item.MaterialId)" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await AddMaterial())">Ekle</MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+<br />
+<MudContainer>
+    <MudCard>
+        <MudForm Model="@model">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Tarif Hazırlama</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTextField @ref="multilineReference" Variant="Variant.Text" Lines="4" Adornment="Adornment.End"
+                              @bind-Value="model.RecipeContent"
+                              Immediate="true"
+                              For="@(() => model.RecipeContent)"
+                              Label="Hazırlanışı" />
+            </MudCardContent>
+        </MudForm>
+
+    </MudCard>
+</MudContainer>
+<br />
+<MudContainer>
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">Resim Ekleme</MudText>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudImage Src="@_userAvatar" @onclick="DisplayAction" Height="100" Width="100" Elevation="25" Class="rounded my-2"></MudImage>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Kaydet</MudButton>
+        </MudCardActions>
+    </MudCard>
+</MudContainer>
+

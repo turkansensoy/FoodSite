@@ -13,6 +13,8 @@ namespace DataAccess.Concrete
     {
         public DbSet<Category> categories { get; set; }
         public DbSet<Recipe> Recipes { get; set; }
+        public DbSet<RecipeMaterial> RecipeMaterials { get; set; }
+        public DbSet<Material> Materials { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

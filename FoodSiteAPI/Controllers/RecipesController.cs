@@ -1,5 +1,6 @@
 ﻿using Business.Abstract;
 using Entities.Concrete;
+using Entities.Dtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,30 +11,28 @@ namespace FoodSiteAPI.Controllers
     public class RecipesController : ControllerBase
     {
         private readonly IRecipeService _recipeService;
-        public RecipesController(IRecipeService recipeService)
+        private readonly IRecipeMaterialService _recipeMaterialService;
+        private readonly IMaterialService _materialService;
+        public RecipesController(IRecipeService recipeService, IRecipeMaterialService recipeMaterialService, IMaterialService materialService)
         {
             _recipeService = recipeService;
+            _recipeMaterialService = recipeMaterialService;
+            _materialService = materialService;
         }
         [HttpGet]
         public IActionResult GetAll()
         {
-            var result = _recipeService.GetAll();
+            var result = _recipeService.GetAllRecipeDto();
             return Ok(result);
         }
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Recipe recipe)
+        public async Task<IActionResult> Add([FromBody] RecipeMaterialAddDto recipe)
         {
-            if (!ModelState.IsValid)
+            var recipeMaterialDto = new Recipe()
             {
-                return BadRequest();
-            }
-            var createdRecipe = new Recipe
-            {
-                Id = recipe.Id,
                 RecipeName = recipe.RecipeName,
-                Materials = recipe.Materials,
-                RecipeContent = recipe.RecipeContent,
                 NumberofPerson = recipe.NumberofPerson,
+                RecipeContent = recipe.RecipeContent,
                 PreparationTime = recipe.PreparationTime,
                 CookingTime = recipe.CookingTime,
                 UserEmail = recipe.UserEmail,
@@ -41,17 +40,30 @@ namespace FoodSiteAPI.Controllers
                 RecipeDateTime = DateTime.Now,
                 IsConfirm = recipe.IsConfirm,
                 IsSend = recipe.IsSend,
-                CategoryId = recipe.CategoryId,
-
+                IsTurnBack=recipe.IsTurnBack,
+                CategoryId = recipe.CategoryId
             };
+
             if (!string.IsNullOrWhiteSpace(recipe.Image))
             {
                 byte[] imgBytes = Convert.FromBase64String(recipe.Image);
-                string fileName = $"{Guid.NewGuid()}_{createdRecipe.RecipeName.Trim()}.jpeg";
+                string fileName = $"{Guid.NewGuid()}_{recipeMaterialDto.RecipeName.Trim()}_{recipeMaterialDto.RecipeName.Trim()}.jpeg";
                 string image = await UploadFile(imgBytes, fileName);
-                createdRecipe.Image = image;
+                recipeMaterialDto.Image = image;
             }
-            var result = _recipeService.Add(createdRecipe);
+            _recipeService.Add(recipeMaterialDto);
+
+            foreach (var item in recipe.recipeMaterialDtos)
+            {
+                var createRecipeMaterial = new RecipeMaterial()
+                {
+                    RecipeId = recipeMaterialDto.Id,
+                    MaterialId = item.MaterialId,
+                    MaterialNumber = item.MaterialNumber,
+                    Guantity = item.Guantity
+                };
+                _recipeMaterialService.Add(createRecipeMaterial);
+            }
             return Ok(recipe);
         }
         private async Task<string> UploadFile(byte[] bytes, string fileName)
@@ -66,13 +78,67 @@ namespace FoodSiteAPI.Controllers
         }
 
         [HttpPut]
-        public IActionResult Update([FromBody] Recipe recipe)
+        public async Task<IActionResult> UpdateAsync([FromBody] RecipeDto recipe)
         {
-            if (!ModelState.IsValid)
+            var recipeMaterialDto = new Recipe()
             {
-                return BadRequest();
+                Id = recipe.Id,
+                RecipeName = recipe.RecipeName,
+                NumberofPerson = recipe.NumberofPerson,
+                RecipeContent = recipe.RecipeContent,
+                PreparationTime = recipe.PreparationTime,
+                CookingTime = recipe.CookingTime,
+                UserEmail = recipe.UserEmail,
+                UserName = recipe.UserName,
+                RecipeDateTime = DateTime.Now,
+                IsConfirm = recipe.IsConfirm,
+                IsSend = recipe.IsSend,
+                IsTurnBack= recipe.IsTurnBack,
+                CategoryId = recipe.CategoryId
+            };
+
+            if (recipe.Image.Contains("jpeg") != true)
+            {
+                if (!string.IsNullOrWhiteSpace(recipe.Image))
+                {
+                    byte[] imgBytes = Convert.FromBase64String(recipe.Image);
+                    string fileName = $"{Guid.NewGuid()}_{recipeMaterialDto.RecipeName.Trim()}.jpeg";
+                    string image = await UploadFile(imgBytes, fileName);
+                    recipeMaterialDto.Image = image;
+                }
             }
-            var result = _recipeService.Update(recipe);
+            recipeMaterialDto.Image = recipe.Image;
+
+            _recipeService.Update(recipeMaterialDto);
+
+            foreach (var item in recipe.recipeMaterialDtos)
+            {
+                var result = _recipeMaterialService.GetByMultiSelectMaterialDto(item.Id);
+                if (result != null)
+                {
+                    var createRecipeMaterial = new RecipeMaterial()
+                    {
+                        Id = item.Id,
+                        RecipeId = recipeMaterialDto.Id,
+                        MaterialId = item.MaterialId,
+                        MaterialNumber = item.MaterialNumber,
+                        Guantity = item.Guantity
+                    };
+                    _recipeMaterialService.Update(createRecipeMaterial);
+                }
+                else
+                {
+                    var createRecipeMaterial1 = new RecipeMaterial()
+                    {
+                        RecipeId = recipeMaterialDto.Id,
+                        MaterialId = item.MaterialId,
+                        MaterialNumber = item.MaterialNumber,
+                        Guantity = item.Guantity
+                    };
+                    _recipeMaterialService.Add(createRecipeMaterial1);
+                }
+
+            }
             return Ok(recipe);
         }
 
@@ -81,14 +147,76 @@ namespace FoodSiteAPI.Controllers
         {
             var recipe = _recipeService.GetById(id);
             var deletedRecipe = _recipeService.Delete(recipe);
-            return Ok(deletedRecipe);
+            return Ok();
         }
         [HttpGet("{id:int}")]
-        public IActionResult GetById([FromRoute(Name ="id")] int id)
+        public IActionResult GetById([FromRoute(Name = "id")] int id)
         {
-            var recipe= _recipeService.GetById(id);
+            var recipe = _recipeService.GetById(id);
             return Ok(recipe);
 
+        }
+        [HttpGet("{materialName}")]
+        public IActionResult GetAllRecipeEngine([FromRoute(Name = "materialName")] string materialName)
+        {
+            var result = _recipeService.GetAllRecipeEngine(materialName);
+            List<RecipeEngineDto> recipeEngineDtos = new List<RecipeEngineDto>();
+            foreach (var item in result)
+            {
+                if (item.IsConfirm == true)
+                {
+                    RecipeEngineDto recipeEngineDto = new()
+                    {
+                        Id = item.Id,
+                        RecipeName = item.RecipeName,
+                        IsConfirm = item.IsConfirm,
+                    };
+                    var response = _materialService.GetByMultiSelectMaterialDto(item.Id);
+                    recipeEngineDto.MaterialDtos = new List<MaterialDto>();
+                    foreach (var item1 in response)
+                    {
+                        MaterialDto materialDto = new()
+                        {
+                            Id = item1.id,
+                            MaterialName = item1.MaterialName,
+                        };
+                        recipeEngineDto.MaterialDtos.Add(materialDto);
+                    }
+                    recipeEngineDtos.Add(recipeEngineDto);
+                }
+            }
+            return Ok(recipeEngineDtos);
+        }
+        [HttpGet("listWhatToDo")]
+        public IActionResult GetAllEngine()
+        {
+            var result = _recipeService.GetAllEngine();
+            List<RecipeEngineDto> recipeEngineDtos = new List<RecipeEngineDto>();
+            foreach (var item in result)
+            {
+                if (item.IsConfirm == true)
+                {
+                    RecipeEngineDto recipeEngineDto = new()
+                    {
+                        Id = item.Id,
+                        RecipeName = item.RecipeName,
+                        IsConfirm = item.IsConfirm,
+                    };
+                    var response = _materialService.GetByMultiSelectMaterialDto(item.Id);
+                    recipeEngineDto.MaterialDtos = new List<MaterialDto>();
+                    foreach (var item1 in response)
+                    {
+                        MaterialDto materialDto = new()
+                        {
+                            Id = item1.id,
+                            MaterialName = item1.MaterialName,
+                        };
+                        recipeEngineDto.MaterialDtos.Add(materialDto);
+                    }
+                    recipeEngineDtos.Add(recipeEngineDto);
+                }
+            }
+            return Ok(recipeEngineDtos);
         }
     }
 

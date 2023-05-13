@@ -1,33 +1,19 @@
-﻿@page "/senderRecipe"
+﻿@page "/notConfirmComponent"
 @using Entities.Concrete;
 @using Entities.Dtos;
-@using FoodSiteMAUI.Data.Services.Abstract;
-
 @inject IRecipeService _recipeService;
 @inject IMaterialService _materialService;
 @inject IRecipeMaterialService _recipeMaterialService;
 @inject NavigationManager NavigatonManager;
-
 <MudBreadcrumbs Items="_items"></MudBreadcrumbs>
 <MudDivider Class="my-1" />
 <br />
 <MudGrid>
     <MudItem sm="6" md="4">
-        <MudText Typo="Typo.h5">Taslak Tariflerim</MudText>
+        <MudText Typo="Typo.h5">Onaylanmayan Tariflerim</MudText>
     </MudItem>
 </MudGrid>
 <br />
-<MudItem>
-    <MudCard style="box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;">
-        <MudCardActions Class="d-flex align-start flex-grow-1 gap-4" Elevation="0">
-            <MudButton Href="/recipeMaterialForm" Variant="Variant.Filled" Class="py-2 d-flex flex-1" StartIcon="@Icons.Material.Filled.Add" Style="@($"color:{Colors.Grey.Lighten5}; background:{Colors.Blue.Lighten3};")">Tarif oluştur</MudButton>
-        </MudCardActions>
-    </MudCard>
-</MudItem>
-<br />
-<MudDivider Class="my-2" />
-<br />
-
 @if (listRecipe == null)
 {
     <p><em>Loading...</em></p>
@@ -36,7 +22,7 @@ else
 {
     @foreach (var item in listRecipe)
     {
-        @if (item.IsSend !=true)
+        @if (item.IsTurnBack == true)
         {
             <MudItem>
                 <MudCard style="box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px inset, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px inset;">
@@ -57,22 +43,22 @@ else
     }
 }
 @code {
-    private List<RecipeDto> listRecipe;
-    List<MultiSelectMaterialDto> ListMultiSelectMaterial = new();
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
         new BreadcrumbItem("Home", href: "#", icon: Icons.Material.Filled.Home),
         new BreadcrumbItem("Videos", href: "#", icon: Icons.Material.Filled.VideoLibrary),
         new BreadcrumbItem("Taslak Tariflerim", href: null, disabled: true, icon: Icons.Material.Filled.Create)
     };
-    protected override async Task OnInitializedAsync()
+    private List<RecipeDto> listRecipe;
+    List<MultiSelectMaterialDto> ListMultiSelectMaterial = new();
+
+    protected async override Task OnInitializedAsync()
     {
         listRecipe = await _recipeService.GetAll();
-
     }
     private async void DeleteItem(int id)
     {
-        List<MultiSelectMaterialDto> result = await _materialService.GetMultiSelectMaterial(id);
+        var result = await _materialService.GetMultiSelectMaterial(id);
         if (result != null)
         {
             foreach (var item in result)
@@ -81,10 +67,8 @@ else
             }
         }
         _recipeService.Delete(id);
-
-        NavigatonManager.NavigateTo("/senderRecipe", forceLoad: true);
     }
-    public async void SendItemAsync(int id)
+    private async void SendItemAsync(int id)
     {
         Recipe recipeItem = await _recipeService.GetById(id);
         ListMultiSelectMaterial = await _materialService.GetMultiSelectMaterial(id);
@@ -102,7 +86,7 @@ else
                 RecipeDateTime = DateTime.Now,
                 IsConfirm = false,
                 IsSend = true,
-                IsTurnBack= false,
+                IsTurnBack = false,
                 CategoryId = recipeItem.CategoryId
             };
         recipeAdd.recipeMaterialDtos = new List<RecipeMaterialDto>();
@@ -118,6 +102,6 @@ else
             recipeAdd.recipeMaterialDtos.Add(recipeMaterial);
         }
         var result = await _recipeService.Update(recipeAdd);
-        NavigatonManager.NavigateTo("/senderRecipe", forceLoad: true);
+        NavigatonManager.NavigateTo("/notConfirmComponent", forceLoad: true);
     }
 }

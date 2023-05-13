@@ -1,4 +1,5 @@
 ﻿using Entities.Concrete;
+using Entities.Dtos;
 using FoodSiteMAUI.Data.Services.Abstract;
 using Newtonsoft.Json;
 using System;
@@ -15,11 +16,19 @@ namespace FoodSiteMAUI.Data.Services.Concrete
         private readonly HttpClient _httpClient;
         public CategoryService(HttpClient httpClient)
         {
-            _httpClient = httpClient;   
+            _httpClient = httpClient;
         }
-        public Task<Category> Add(Category category)
+        public async Task<Category> Add(Category category)
         {
-            throw new NotImplementedException();
+            var response = await _httpClient.PostAsync("api/Categories", new StringContent(
+                JsonConvert.SerializeObject(category), Encoding.UTF8, "application/json"));
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<Category>();
+        }
+        public async void Delete(int id)
+        {
+            var responseMessage = await _httpClient.DeleteAsync($"api/Categories/{id}");
+            responseMessage.EnsureSuccessStatusCode();
         }
 
         public async Task<List<Category>> GetAll()
@@ -29,6 +38,13 @@ namespace FoodSiteMAUI.Data.Services.Concrete
 
             var stringContent = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<List<Category>>(stringContent);
+        }
+
+        public async Task<Category> Update(Category category)
+        {
+           var responseMessage= await _httpClient.PutAsJsonAsync("api/Categories", category);
+            responseMessage.EnsureSuccessStatusCode();
+           return await responseMessage.Content.ReadFromJsonAsync<Category>();
         }
     }
 }

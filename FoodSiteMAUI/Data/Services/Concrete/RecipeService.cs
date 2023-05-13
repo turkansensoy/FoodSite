@@ -1,4 +1,5 @@
 ﻿using Entities.Concrete;
+using Entities.Dtos;
 using FoodSiteMAUI.Data.Services.Abstract;
 using Newtonsoft.Json;
 using System;
@@ -17,10 +18,10 @@ namespace FoodSiteMAUI.Data.Services.Concrete
         {
             _httpClient = httpClient;
         }
-        public async Task<Recipe> Add(Recipe recipes)
+        public async Task<Recipe> Add(RecipeMaterialAddDto recipeMaterialAddDto)
         {
             var response = await _httpClient.PostAsync("api/Recipes", new StringContent(
-             JsonConvert.SerializeObject(recipes), Encoding.UTF8, "application/json"));
+             JsonConvert.SerializeObject(recipeMaterialAddDto), Encoding.UTF8, "application/json"));
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<Recipe>();
         }
@@ -31,13 +32,21 @@ namespace FoodSiteMAUI.Data.Services.Concrete
             responseMessage.EnsureSuccessStatusCode(); 
         }
 
-        public async Task<List<Recipe>> GetAll()
+        public async Task<List<RecipeDto>> GetAll()
         {
             var response = await _httpClient.GetAsync("api/Recipes");
             response.EnsureSuccessStatusCode();
 
             var stringContent = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<List<Recipe>>(stringContent);
+            return JsonConvert.DeserializeObject<List<RecipeDto>>(stringContent);
+        }
+
+        public async Task<List<RecipeEngineDto>> GetAllRecipeEngine()
+        {
+           var  httpResponse= await _httpClient.GetAsync("api/Recipes/listWhatToDo");
+            httpResponse.EnsureSuccessStatusCode();
+            var  stringContent= await httpResponse.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<List<RecipeEngineDto>>(stringContent);
         }
 
         public async Task<Recipe> GetById(int id)
@@ -47,11 +56,18 @@ namespace FoodSiteMAUI.Data.Services.Concrete
             return await response.Content.ReadFromJsonAsync<Recipe>();
         }
 
-        public async Task<Recipe> Update(Recipe recipes)
+        public async Task<List<RecipeEngineDto>> GetRecipeEngineDtos(string materialName)
+        {
+            var response= await _httpClient.GetAsync($"api/Recipes/{materialName}");
+            response.EnsureSuccessStatusCode();
+           return await response.Content.ReadFromJsonAsync<List<RecipeEngineDto>>();
+        }
+
+        public async Task<RecipeDto> Update(RecipeDto recipes)
         {
           var responseMessage = await  _httpClient.PutAsJsonAsync("api/Recipes", recipes);
             responseMessage.EnsureSuccessStatusCode();
-            return await responseMessage.Content.ReadFromJsonAsync<Recipe>();
+            return await responseMessage.Content.ReadFromJsonAsync<RecipeDto>();
         }
     }
 }

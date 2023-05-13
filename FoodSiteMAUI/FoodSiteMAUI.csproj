@@ -50,17 +50,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Images\65b05916-7f90-4e77-995e-916886ace02d_xbm.png" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Content Include="Images\65b05916-7f90-4e77-995e-916886ace02d_xbm.png">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="FluentValidation" Version="11.5.1" />
       <PackageReference Include="MudBlazor" Version="6.2.0" />
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

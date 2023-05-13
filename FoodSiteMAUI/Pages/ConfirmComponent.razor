@@ -1,0 +1,124 @@
+﻿@page "/confirmComponent"
+@using Entities.Concrete;
+@using Entities.Dtos;
+@using Entities.Enums;
+@using FoodSiteMAUI.Data.Services.Abstract;
+
+@inject IRecipeService _recipeService;
+@inject ICategoryService _categoryService;
+@inject IMaterialService _materialService;
+@inject NavigationManager NavigatonManager;
+
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+<MudDivider Class="my-1" />
+<br />
+<MudGrid>
+    <MudItem sm="6" md="4">
+        <MudText Typo="Typo.h5">Tarif Bilgisi</MudText>
+    </MudItem>
+</MudGrid>
+<br />
+@if (ConfirmRecipeDto != null)
+{
+    <MudTable Items="@ConfirmRecipeDto" Hover="true" Breakpoint="Breakpoint.Sm">
+        <ColGroup>
+            <col style="width:300px;" />
+            <col style="width:100px;" />
+            <col />
+            <col style="width:100px;" />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh></MudTh>
+            <MudTh>Name</MudTh>
+            <MudTh>Tarif Adı</MudTh>
+            <MudTh>Durum</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowBtnPress(context.Id))">@((context.ShowDetails == true) ? "Sakla" : "Göster") Detayları</MudButton></MudTd>
+            <MudTd DataLabel="Name">@context.RecipeName</MudTd>
+            <MudTd DataLabel="Tarif Adı">@context.UserName</MudTd>
+            <MudTd DataLabel="Durum">
+                <MudButtonGroup Color="Color.Info" Size="Size.Medium" Variant="Variant.Filled">
+                    <MudButton StartIcon="@Icons.Material.Filled.Send" Color="Color.Secondary" OnClick="@(()=> Submit(context.Id))">Onayla</MudButton>
+                    <MudButton StartIcon="@Icons.Material.Filled.Edit" Color="Color.Secondary" OnClick="@(()=> EditConfirmRecipe(context.Id))">Düzenlensin</MudButton>
+                </MudButtonGroup>
+            </MudTd>
+        </RowTemplate>
+        <ChildRowContent>
+            @if (context.ShowDetails)
+            {
+                <MudTr>
+                    <td colspan="4">
+                        <MudForm>
+                            <MudCard Elevation="0">
+                                <MudCardHeader>
+                                    <CardHeaderContent>
+                                        <MudText Align="Align.Center" Typo="Typo.body1"><strong>@context.UserEmail</strong> Emaili olan <strong>@context.UserName </strong> kişisinin tarif bilgileri</MudText>
+                                    </CardHeaderContent>
+                                </MudCardHeader>
+                                <MudCardContent>
+                                    <MudItem>
+                                        <MudField Label="Tarif Adı" Variant="Variant.Text" Disabled="true">@context.RecipeName</MudField>
+                                    </MudItem>
+                                    <br />
+                                    <MudSelect Label="Kategori" @bind-Value="context.CategoryId" Disabled="true" For="@(()=>context.CategoryId)">
+                                        @if (categorynameselect != null)
+                                    {
+                                        @foreach (var item in categorynameselect)
+                                        {
+                                            <MudSelectItem Value="item.Id">@item.CategoryName</MudSelectItem>
+                                        }
+                                    }
+                                </MudSelect>
+                                <br /><br />
+                                <MudGrid Class="d-flex align-start flex-grow-1 gap-4" Elevation="0">
+                                    <MudItem Class="py-2 d-flex flex-1" sm="6">
+                                        <MudNumericField Label="Kaç Kişilik"
+                                                     @bind-Value="context.NumberofPerson" Disabled="true" />
+                                    </MudItem>
+                                    <MudItem Class="py-2 d-flex flex-1" sm="6">
+                                        <MudNumericField @bind-Value="context.PreparationTime"
+                                                     Label="Hazırlanma Süresi" Disabled="true" />
+                                    </MudItem>
+                                    <MudItem Class="py-2 d-flex flex-1" sm="6">
+                                        <MudNumericField @bind-Value="context.CookingTime"
+                                                     Label="Pişirme Süresi" Disabled="true" />
+                                    </MudItem>
+                                </MudGrid>
+                                <br />
+                                <MudTextField @ref="multilineReference" Variant="Variant.Outlined" Lines="4" Adornment="Adornment.End"
+                                          @bind-Value="context.RecipeContent"
+                                          Immediate="true"
+                                          Label="Hazırlanışı" Disabled="true" />
+
+                            </MudCardContent>
+                            <br />
+                            <MudCardContent>
+                                <MudItem><MudText Typo="Typo.inherit"> <strong>Malzemeler</strong></MudText></MudItem>
+                                <MudTable Items="@context.recipeMaterialDtos" Context="AddressContext" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="0">
+                                    <ColGroup>
+                                        <col />
+                                        <col />
+                                        <col style="width:200px;" />
+                                    </ColGroup>
+                                    <HeaderContent>
+                                        <MudTh>Miktar</MudTh>
+                                        <MudTh>Ölçü</MudTh>
+                                        <MudTh>Malzeme</MudTh>
+                                    </HeaderContent>
+                                    <RowTemplate>
+                                        <MudTd DataLabel="Miktar">@AddressContext.MaterialNumber</MudTd>
+                                        <MudTd DataLabel="Ölçü">@AddressContext.Guantity</MudTd>
+                                        <MudTd DataLabel="Malzeme">@AddressContext.MaterialName</MudTd>
+                                    </RowTemplate>
+                                </MudTable>
+                                <MudImage Src="@($"https://localhost:7018/{context.Image}")" Height="200" Width="300" Elevation="25" Class="rounded my-2"></MudImage>
+                            </MudCardContent>
+                        </MudCard>
+                    </MudForm>
+                </td>
+            </MudTr>
+            }
+        </ChildRowContent>
+    </MudTable>
+}

@@ -1,0 +1,61 @@
+﻿@using Entities.Concrete;
+<h3>AddCategoryList</h3>
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+<MudDivider Class="my-1" />
+<br />
+<MudGrid>
+    <MudItem sm="6" md="4">
+        <MudText Typo="Typo.h5">Kategori Bilgisi</MudText>
+    </MudItem>
+</MudGrid>
+<br />
+<MudContainer>
+    <MudCard>
+        <MudForm Model="@model" @ref="@form">
+            <MudCardContent>
+                <MudTextField @bind-Value="model.CategoryName"
+                              Label="User Name" />
+                <br />
+                <MudText>Resim Yükleme</MudText>
+                <MudImage Src="@_userAvatar" @onclick="DisplayAction" Height="100" Width="100" Elevation="25" Class="rounded my-2"></MudImage>
+            </MudCardContent>
+        </MudForm>
+    </MudCard>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class=" justify-end ml-auto" OnClick="@(async () => await Submit())">Kaydet</MudButton>
+</MudContainer>
+@code {
+    MudForm form;
+    Category model = new();
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+        {
+            new BreadcrumbItem("Home", href: "#", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem("Kaategori", href: "/senderRecipe", icon: Icons.Material.Filled.VideoLibrary),
+            new BreadcrumbItem("Yeni Kategori", href: null, disabled: true, icon: Icons.Material.Filled.Create)
+        };
+    private string _imageBase64Data;
+    private string _userAvatar = "images/cooking.png";
+
+    private async Task Submit()
+    {
+        
+    }
+
+    private async void DisplayAction()
+    {
+        var photo = await MediaPicker.Default.PickPhotoAsync();
+        if (photo != null)
+        {
+            byte[] imageBytes;
+            var newFile = Path.Combine(FileSystem.CacheDirectory, photo.FileName);
+            var stream = await photo.OpenReadAsync();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                stream.CopyTo(ms);
+                imageBytes = ms.ToArray();
+            }
+            _imageBase64Data = Convert.ToBase64String(imageBytes);
+            _userAvatar = string.Format("data:image/png;base64,{0}", _imageBase64Data);
+            this.StateHasChanged();
+        }
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using Business.Abstract;
 using DataAccess.Abstract;
 using Entities.Concrete;
+using Entities.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Business.Concrete
         private readonly IRecipeRepository _recipeRepository;
         public RecipeManager(IRecipeRepository recipeService)
         {
-            _recipeRepository = recipeService;   
+            _recipeRepository = recipeService;
         }
         public string Add(Recipe recipe)
         {
@@ -28,14 +29,24 @@ namespace Business.Concrete
             return "";
         }
 
-        public List<Recipe> GetAll()
+        public List<RecipeEngineDto> GetAllEngine()
         {
-           return  _recipeRepository.GetAll();
+            return _recipeRepository.GetAllEngine();
+        }
+
+        public List<RecipeDto> GetAllRecipeDto()
+        {
+            return _recipeRepository.GetAllRecipe();
+        }
+
+        public List<RecipeEngineDto> GetAllRecipeEngine(string materialName)
+        {
+            return _recipeRepository.GetAllRecipeEngine(materialName);
         }
 
         public Recipe GetById(int id)
         {
-            return _recipeRepository.Get(_=>_.Id== id);
+            return _recipeRepository.Get(_ => _.Id == id);
         }
 
         public string Update(Recipe recipe)
