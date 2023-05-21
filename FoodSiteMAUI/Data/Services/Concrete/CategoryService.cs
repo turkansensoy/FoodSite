@@ -40,6 +40,13 @@ namespace FoodSiteMAUI.Data.Services.Concrete
             return JsonConvert.DeserializeObject<List<Category>>(stringContent);
         }
 
+        public async Task<Category> GetById(int id)
+        {
+           var responseMessage= await _httpClient.GetAsync($"api/Categories/{id}");
+            responseMessage.EnsureSuccessStatusCode();
+           return await responseMessage.Content.ReadFromJsonAsync<Category>();
+        }
+
         public async Task<Category> Update(Category category)
         {
            var responseMessage= await _httpClient.PutAsJsonAsync("api/Categories", category);

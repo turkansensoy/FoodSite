@@ -7,15 +7,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FoodSiteMAUI.Pages
+namespace FoodSiteMAUI.Pages.Admin
 {
     public partial class ConfirmComponent
     {
         private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
     {
-        new BreadcrumbItem("Home", href: "#", icon: Icons.Material.Filled.Home),
-        new BreadcrumbItem("Videos", href: "#", icon: Icons.Material.Filled.VideoLibrary),
-        new BreadcrumbItem("Create", href: null, disabled: true, icon: Icons.Material.Filled.Create)
+        new BreadcrumbItem("AnaSayfa", href: "#", icon: Icons.Material.Filled.Home),
+        new BreadcrumbItem("Tarif Onaylama", href: null, disabled: true, icon: Icons.Material.Filled.ChecklistRtl)
     };
 
         private static List<ComfirmRecipeDto> ConfirmRecipeDto;
@@ -117,7 +116,7 @@ namespace FoodSiteMAUI.Pages
             var result = await _recipeService.Update(recipeAdd);
             var comfirmRecipeDto = ConfirmRecipeDto.Find(_ => _.Id == id);
             ConfirmRecipeDto.Remove(comfirmRecipeDto);
-            NavigatonManager.NavigateTo("/confirmComponent", forceLoad: true);
+            NavigatonManager.NavigateTo("/Admin/confirmComponent", forceLoad: true);
         }
         private async void EditConfirmRecipe(int id)
         {
@@ -155,7 +154,7 @@ namespace FoodSiteMAUI.Pages
             var result = await _recipeService.Update(recipeAdd);
             var comfirmRecipeDto = ConfirmRecipeDto.Find(_ => _.Id == id);
             ConfirmRecipeDto.Remove(comfirmRecipeDto);
-            NavigatonManager.NavigateTo("/confirmComponent", forceLoad: true);
+            NavigatonManager.NavigateTo("/Admin/confirmComponent", forceLoad: true);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace FoodSiteMAUI.Pages
         protected override async Task OnInitializedAsync()
         {
             model = await _recipeService.GetById(Convert.ToInt32(id));
-            _userAvatar = model.Image;
+            _userAvatar = $"https://localhost:7018/{model.Image}";
             ListMultiSelectMaterial = await _materialService.GetMultiSelectMaterial(Convert.ToInt32(id));
             categorynameselect = await _categoryService.GetAll();
             materialDtoSelect = await _materialService.GetAll();

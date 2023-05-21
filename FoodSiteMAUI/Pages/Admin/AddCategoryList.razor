@@ -1,5 +1,9 @@
-﻿@using Entities.Concrete;
-<h3>AddCategoryList</h3>
+﻿@page "/addCategoryList"
+@using Business.ValidationRules.FluentValidation;
+@using Entities.Concrete;
+
+@inject ICategoryService _categoryService;
+@inject NavigationManager NavigatonManager;
 <MudBreadcrumbs Items="_items"></MudBreadcrumbs>
 <MudDivider Class="my-1" />
 <br />
@@ -11,25 +15,34 @@
 <br />
 <MudContainer>
     <MudCard>
-        <MudForm Model="@model" @ref="@form">
+        <MudForm Model="@model" @ref="@form" Validation="@(CategoryValidator.ValidateValue)" ValidationDelay="0">
             <MudCardContent>
                 <MudTextField @bind-Value="model.CategoryName"
-                              Label="User Name" />
+                              For="@(()=>model.CategoryName)"
+                              Immediate="true"
+                              Label="Kategori Adı" />
                 <br />
                 <MudText>Resim Yükleme</MudText>
                 <MudImage Src="@_userAvatar" @onclick="DisplayAction" Height="100" Width="100" Elevation="25" Class="rounded my-2"></MudImage>
             </MudCardContent>
         </MudForm>
     </MudCard>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class=" justify-end ml-auto" OnClick="@(async () => await Submit())">Kaydet</MudButton>
+    <MudItem>
+        <br />
+        <div Class="d-flex justify-end">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class=" justify-end" OnClick="@(async () => await Submit())">Kaydet</MudButton>
+        </div>
+    </MudItem>
+
 </MudContainer>
 @code {
     MudForm form;
     Category model = new();
+    CategoryValidator CategoryValidator = new();
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
-            new BreadcrumbItem("Home", href: "#", icon: Icons.Material.Filled.Home),
-            new BreadcrumbItem("Kaategori", href: "/senderRecipe", icon: Icons.Material.Filled.VideoLibrary),
+            new BreadcrumbItem("AnaSayfa", href: "#", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem("Kategoriler", href: "/admin/categorylist", icon: Icons.Material.Filled.Category),
             new BreadcrumbItem("Yeni Kategori", href: null, disabled: true, icon: Icons.Material.Filled.Create)
         };
     private string _imageBase64Data;
@@ -37,7 +50,17 @@
 
     private async Task Submit()
     {
-        
+        await form.Validate();
+        if (form.IsValid)
+        {
+            if (!string.IsNullOrWhiteSpace(_imageBase64Data))
+            {
+                model.Image = _imageBase64Data;
+            }
+            await _categoryService.Add(model);
+            NavigatonManager.NavigateTo("/admin/categorylist/", forceLoad: true);
+        }
+
     }
 
     private async void DisplayAction()

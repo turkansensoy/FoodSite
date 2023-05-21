@@ -25,27 +25,21 @@ namespace FoodSiteAPI.Controllers
         }
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] Category category)
-        {           
+        {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            var createdCategory = new Category
-            {
-                Id = category.Id,
-                CategoryName = category.CategoryName,
-            };
+
             if (!string.IsNullOrWhiteSpace(category.Image))
             {
                 byte[] imgBytes = Convert.FromBase64String(category.Image);
-                string fileName = $"{Guid.NewGuid()}_{createdCategory.CategoryName.Trim()}.jpeg";
+                string fileName = $"{Guid.NewGuid()}_{category.CategoryName.Trim()}.jpeg";
                 string image = await UploadFile(imgBytes, fileName);
-                createdCategory.Image = image;
+                category.Image = image;
             }
-            var result = _categoryService.Add(category);
-            return Ok(result);
-
-
+            _categoryService.Add(category);
+            return Ok(category);
         }
         private async Task<string> UploadFile(byte[] bytes, string fileName)
         {
@@ -58,14 +52,24 @@ namespace FoodSiteAPI.Controllers
             return uploadsFolder;
         }
         [HttpPut]
-        public IActionResult Update([FromBody] Category category)
+        public async Task<IActionResult> UpdateAsync([FromBody] Category category)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            var result = _categoryService.Update(category);
-            return Ok(result);
+            if (category.Image.Contains("jpeg") != true)
+            {
+                if (!string.IsNullOrWhiteSpace(category.Image))
+                {
+                    byte[] imgBytes = Convert.FromBase64String(category.Image);
+                    string fileName = $"{Guid.NewGuid()}_{category.CategoryName.Trim()}.jpeg";
+                    string image = await UploadFile(imgBytes, fileName);
+                    category.Image = image;
+                }
+            }
+            _categoryService.Update(category);
+            return Ok(category);
         }
 
         [HttpDelete("{id:int}")]
@@ -74,6 +78,12 @@ namespace FoodSiteAPI.Controllers
             var category = _categoryService.GetById(id);
             return Ok(_categoryService.Delete(category));
 
+        }
+        [HttpGet("{id:int}")]
+        public IActionResult GetById([FromRoute(Name ="id")] int id) 
+        {
+           var category= _categoryService.GetById(id);
+            return Ok(category);
         }
     }
 }

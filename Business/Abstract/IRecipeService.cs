@@ -10,7 +10,7 @@ namespace Business.Abstract
         String Update(Recipe recipe);
         String Delete(Recipe recipe);
         Recipe GetById(int id);
-        List<RecipeEngineDto> GetAllRecipeEngine(string materialName);
+        List<RecipeEngineDto> GetAllRecipeEngine(int materialId);
         List<RecipeEngineDto> GetAllEngine();
     }
 }

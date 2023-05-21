@@ -39,9 +39,9 @@ namespace Business.Concrete
             return _recipeRepository.GetAllRecipe();
         }
 
-        public List<RecipeEngineDto> GetAllRecipeEngine(string materialName)
+        public List<RecipeEngineDto> GetAllRecipeEngine(int materialId)
         {
-            return _recipeRepository.GetAllRecipeEngine(materialName);
+            return _recipeRepository.GetAllRecipeEngine(materialId);
         }
 
         public Recipe GetById(int id)

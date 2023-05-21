@@ -156,10 +156,10 @@ namespace FoodSiteAPI.Controllers
             return Ok(recipe);
 
         }
-        [HttpGet("{materialName}")]
-        public IActionResult GetAllRecipeEngine([FromRoute(Name = "materialName")] string materialName)
+        [HttpGet("getRecipeEngine/{id:int}")]
+        public IActionResult GetAllRecipeEngine([FromRoute(Name = "id")] int materialId)
         {
-            var result = _recipeService.GetAllRecipeEngine(materialName);
+            var result = _recipeService.GetAllRecipeEngine(materialId);
             List<RecipeEngineDto> recipeEngineDtos = new List<RecipeEngineDto>();
             foreach (var item in result)
             {
@@ -177,7 +177,7 @@ namespace FoodSiteAPI.Controllers
                     {
                         MaterialDto materialDto = new()
                         {
-                            Id = item1.id,
+                            Id = item1.MaterialId,
                             MaterialName = item1.MaterialName,
                         };
                         recipeEngineDto.MaterialDtos.Add(materialDto);
@@ -208,7 +208,7 @@ namespace FoodSiteAPI.Controllers
                     {
                         MaterialDto materialDto = new()
                         {
-                            Id = item1.id,
+                            Id = item1.MaterialId,
                             MaterialName = item1.MaterialName,
                         };
                         recipeEngineDto.MaterialDtos.Add(materialDto);

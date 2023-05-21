@@ -151,7 +151,7 @@
             <MudText Typo="Typo.h6">Resim Ekleme</MudText>
         </MudCardHeader>
         <MudCardContent>
-            <MudImage Src="@($"https://localhost:7018/{_userAvatar}")" @onclick="DisplayAction" Height="100" Width="100" Elevation="25" Class="rounded my-2"></MudImage>
+            <MudImage Src="@(_userAvatar)" @onclick="DisplayAction" Height="100" Width="100" Elevation="25" Class="rounded my-2"></MudImage>
         </MudCardContent>
         <MudCardActions>
             <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Kaydet</MudButton>

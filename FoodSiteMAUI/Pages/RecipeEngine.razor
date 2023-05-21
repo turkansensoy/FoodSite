@@ -12,29 +12,32 @@
     </MudItem>
 </MudGrid>
 <br />
-<div>
-    <MudChipSet AllClosable="true" OnClose="Closed">
-        @foreach (var value in values)
-        {
-            <MudChip Text="@value"></MudChip>
-        }
-        @foreach (var item in values1)
-        {
-            <MudChip Text="@item" Color="Color.Error"></MudChip>
-        }
-    </MudChipSet>
-    <MudGrid>
-        <MudItem sm="6" md="4">
-            <MudAutocomplete T="string" Label="Malzemeler" @bind-Value="TextValue" SearchFunc="@Search1"
-                             AdornmentColor="Color.Primary" />
-        </MudItem>
-        <MudItem sm="6" md="4">
-            <br />
-            <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="Add">Olsun</MudButton>
-            <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" OnClick="NotAdd">Olmasın</MudButton>
-        </MudItem>
-    </MudGrid>
-</div>
+<MudForm Model="AddContainAndNotContainMaterial">
+    <div>
+        <MudChipSet AllClosable="true" OnClose="Closed">
+            @foreach (var value in containMaterials)
+            {
+                <MudChip Text="@value.MaterialName"></MudChip>
+            }
+            @foreach (var item in notContainMaterials)
+            {
+                <MudChip Text="@item.MaterialName" Color="Color.Error"></MudChip>
+            }
+        </MudChipSet>
+        <MudGrid>
+            <MudItem sm="6" md="4">
+                <MudAutocomplete T=MaterialDto Label="Malzemeler" @bind-Value="AddContainAndNotContainMaterial" SearchFunc="@Search1"
+                                 ToStringFunc=DisplayValue
+                                 AdornmentColor="Color.Primary" />
+            </MudItem>
+            <MudItem sm="6" md="4">
+                <br />
+                <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Primary" OnClick="Add">Olsun</MudButton>
+                <MudButton Variant="Variant.Filled" Size="Size.Small" Color="Color.Error" OnClick="NotAdd">Olmasın</MudButton>
+            </MudItem>
+        </MudGrid>
+    </div>
+</MudForm>
 <MudItem>
     <MudCard style="box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;">
         <MudCardActions Class="d-flex align-start flex-grow-1 gap-4" Elevation="0">
@@ -43,7 +46,7 @@
     </MudCard>
 </MudItem>
 <br />
-@if (model== null)
+@if (model == null)
 {
     <p>Ekleme yapınız</p>
 }
@@ -66,7 +69,7 @@ else
                 <MudCardContent>
                     @foreach (var item1 in item.MaterialDtos)
                     {
-                        @if (values.Contains(item1.MaterialName) == true)
+                        @if (containMaterials.Exists(_ => _.Id == item1.Id) == true)
                         {
                             <MudChip Disabled="false">@item1.MaterialName</MudChip>
                         }
@@ -91,37 +94,40 @@ else
     };
     MudForm form;
 
-    public string TextValue { get; set; }
-    List<string> values = new List<string>(); // material contain
-    List<string> values1 = new List<string>();// material notcontain
+    MaterialDto AddContainAndNotContainMaterial = new MaterialDto();
+    List<MaterialDto> containMaterials = new List<MaterialDto>();
+    List<MaterialDto> notContainMaterials = new List<MaterialDto>();// material notcontain
     List<RecipeEngineDto> model = new();
     public void Add()
     {
-        if (values.Contains(TextValue) == false)
-        {
-            values.Add(TextValue);   
-        }
+        if (containMaterials.Contains(AddContainAndNotContainMaterial) != true && notContainMaterials.Contains(AddContainAndNotContainMaterial) != true)
+            containMaterials.Add(AddContainAndNotContainMaterial);
+        AddContainAndNotContainMaterial = new() { Id = 0, MaterialName = "" };
     }
+
     public void NotAdd()
     {
-        if (values1.Contains(TextValue) == false && values.Contains(TextValue) == false)
-        {
-            values1.Add(TextValue);      
-        }
+        if (containMaterials.Contains(AddContainAndNotContainMaterial) != true && notContainMaterials.Contains(AddContainAndNotContainMaterial) != true)
+            notContainMaterials.Add(AddContainAndNotContainMaterial);
+        AddContainAndNotContainMaterial = new() { Id = 0, MaterialName = "" };
     }
 
     public void Closed(MudChip chip)
     {
-        if (values.Contains(chip.Text) == true)
+        var result = containMaterials.Find(_ => _.MaterialName == chip.Text);
+        var result2 = notContainMaterials.Find(_ => _.MaterialName == chip.Text);
+        if (result != null)
         {
-            values.Remove(chip.Text);
+            containMaterials.Remove(result);
         }
-        else
+        else if (result2 != null)
         {
-            values1.Remove(chip.Text);
+            notContainMaterials.Remove(result2);
         }
-    }
 
+        this.StateHasChanged();
+    }
+    private Func<MaterialDto, string?> DisplayValue = item => item is null ? null : item.MaterialName;
     private List<MaterialDto> materialDtoSelect;
     List<string> listmaterialDtoSelect = new();
     protected override async Task OnInitializedAsync()
@@ -135,24 +141,29 @@ else
             }
         }
     }
-    async Task<IEnumerable<string>> Search1(String value)
+    async Task<IEnumerable<MaterialDto>> Search1(string value)
     {
-        await Task.Delay(5);
-        if (string.IsNullOrEmpty(value))
-            return new string[0];
-        return listmaterialDtoSelect.Where(_ => _.Contains(value, StringComparison.InvariantCultureIgnoreCase));
+        //return await Task.FromResult(materialDtoSelect.Where(_=>_.MaterialName.ToLower().Contains(value.ToLower())).ToList());
+        await Task.Yield();
+
+        if (!string.IsNullOrWhiteSpace(value))
+            return materialDtoSelect.Where(item => item.MaterialName.ToLower().Contains(value.ToLower())) ?? materialDtoSelect;
+
+        // return new MaterialDto[0];
+        return materialDtoSelect;
     }
     List<RecipeEngineDto> lists = new List<RecipeEngineDto>();
-    List<RecipeEngineDto> notlist= new();
+    List<RecipeEngineDto> notlist = new();
+
     protected void notContain()
     {
         foreach (var list in lists)
         {
-            foreach (var item in values1)
+            foreach (var item in notContainMaterials)
             {
                 foreach (var material in list.MaterialDtos)
                 {
-                    if (material.MaterialName == item)
+                    if (material.Id == item.Id)
                     {
                         var value = lists.Find(_ => _.Id == list.Id);
                         notlist.Add(value);
@@ -169,25 +180,25 @@ else
     }
     private async Task Submit()
     {
-        if(values.Count !=0 && values1.Count ==0 )
+        if (containMaterials.Count != 0 && notContainMaterials.Count == 0)
         {
-            foreach (var item in values)
+            foreach (var item in containMaterials)
             {
-                model = await _recipeService.GetRecipeEngineDtos(item);
+                model = await _recipeService.GetRecipeEngineDtos(item.Id);
             }
         }
-        else if(values.Count !=0 &&  values1.Count !=0)
+        else if (containMaterials.Count != 0 && notContainMaterials.Count != 0)
         {
-            foreach (var item in values)
+            foreach (var item in containMaterials)
             {
-                lists = await _recipeService.GetRecipeEngineDtos(item);
+                lists = await _recipeService.GetRecipeEngineDtos(item.Id);
             }
             notContain();
         }
-        else if (values1.Count !=0 && values.Count ==0)
+        else if (notContainMaterials.Count != 0 && containMaterials.Count == 0)
         {
             // lists değeri eklenecektir.
-            lists =await _recipeService.GetAllRecipeEngine();
+            lists = await _recipeService.GetAllRecipeEngine();
             notContain();
         }
     }

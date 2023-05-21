@@ -3,6 +3,7 @@ using Entities.Concrete;
 using Entities.Dtos;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -37,14 +38,15 @@ namespace DataAccess.Concrete.Repositories
                 return result.ToList();
             }
         }
-        public List<RecipeEngineDto> GetAllRecipeEngine(string materialName)
+        public List<RecipeEngineDto> GetAllRecipeEngine(int materialId)
         {
             using (BaseDbContext context = new())
             {
+
                 var result = (from m in context.Materials
                               join recipeMaterial in context.RecipeMaterials on m.Id equals recipeMaterial.MaterialId
                               join recipe in context.Recipes on recipeMaterial.RecipeId equals recipe.Id
-                              where m.MaterialName == materialName
+                              where m.Id == materialId
                               select new RecipeEngineDto
                               {
                                   Id = recipe.Id,

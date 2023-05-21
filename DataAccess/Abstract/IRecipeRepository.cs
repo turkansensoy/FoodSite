@@ -13,7 +13,7 @@ namespace DataAccess.Abstract
     {
         List<RecipeDto> GetAllRecipe();
         // List<RecipeDto>  GetRecipeDto(int id);
-        List<RecipeEngineDto> GetAllRecipeEngine(string materialName);
+        List<RecipeEngineDto> GetAllRecipeEngine(int materialId);
         List<RecipeEngineDto> GetAllEngine();
     }
 }

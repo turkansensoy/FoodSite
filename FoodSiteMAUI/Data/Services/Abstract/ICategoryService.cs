@@ -8,5 +8,6 @@ namespace FoodSiteMAUI.Data.Services.Abstract
         void Delete(int id);
         Task<Category> Add(Category category);
         Task<Category> Update(Category category);
+        Task<Category> GetById(int id);
     }
 }

@@ -15,7 +15,7 @@ namespace FoodSiteMAUI.Data.Services.Abstract
         Task<RecipeDto> Update(RecipeDto recipes);
         void Delete(int id);
         Task<Recipe> GetById(int id);
-        Task<List<RecipeEngineDto>> GetRecipeEngineDtos(string materialName);
+        Task<List<RecipeEngineDto>> GetRecipeEngineDtos(int materialId);
         Task<List<RecipeEngineDto>> GetAllRecipeEngine();
     }
 
