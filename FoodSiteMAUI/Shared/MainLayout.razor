@@ -1,40 +1,43 @@
-﻿@inherits LayoutComponentBase
+﻿@using Entities.Concrete;
+@inherits LayoutComponentBase
 
+@inject ICategoryService categoryService;
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 <MudLayout>
-    <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <MudText Typo="Typo.h5" Class="ml-3"></MudText>
-        <MudSpacer />
-        <MudMenu FullWidth="true">
-            <ActivatorContent>
-                <MudChip Icon="@Icons.Material.Filled.Person" Color="Color.Primary">Turkan ŞENSOY</MudChip>
-            </ActivatorContent>
-            <ChildContent>
-                <MudMenuItem>Profile</MudMenuItem>
-                <MudMenuItem>Theme</MudMenuItem>
-                <MudMenuItem>Usage</MudMenuItem>
-                <MudMenuItem>Sign Out</MudMenuItem>
-            </ChildContent>
-        </MudMenu>
-    </MudAppBar>
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu />
-    </MudDrawer>
-    <MudMainContent>
-        <MudContainer>
+    <AppBarPartial />
+    <MudContainer xs="12">
+        <MudCarousel Class="mud-width-full" Style="height:200px;" TData="object">
+           @if (category !=null)
+            {
+                @foreach (var item in category)
+                {
+                    <MudCarouselItem Transition="transition">
+                        <div class="d-flex" style="height:100%">
+                            <MudImage Src="@($"https://localhost:7018/{@item.Image}")" Class="mx-auto my-auto" Height="200" Width="300"></MudImage>
+                        </div>
+                    </MudCarouselItem>
+                }
+            }
+        </MudCarousel>
+    </MudContainer>
+    <NavMenuUser />
+   <MudMainContent>
+        <MudContainer xs="12">
             @Body
         </MudContainer>
-    </MudMainContent>
+   </MudMainContent>
 </MudLayout>
-@code {
-    bool _drawerOpen = true;
 
-    void DrawerToggle()
+@code {
+    private Transition transition = Transition.Slide;
+    List<Category> category;
+    List<Category> categoryList;
+    protected override async Task OnInitializedAsync()
     {
-        _drawerOpen = !_drawerOpen;
+      category = await categoryService.GetAll();
     }
 }

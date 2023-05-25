@@ -17,6 +17,7 @@ namespace FoodSiteMAUI.Data.Services.Abstract
         Task<Recipe> GetById(int id);
         Task<List<RecipeEngineDto>> GetRecipeEngineDtos(int materialId);
         Task<List<RecipeEngineDto>> GetAllRecipeEngine();
+        Task<List<RecipeDto>> GetRecipeByCategoryId(int categoryId);
     }
 
 }

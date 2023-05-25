@@ -1,0 +1,55 @@
+﻿@page "/"
+@using Entities.Dtos;
+@layout MainLayout
+@inject IRecipeService recipeService;
+@inject NavigationManager NavigatonManager;
+<MudGrid>
+    @if (model != null)
+    {
+        @foreach (var item in model)
+        {
+            @if (item.IsConfirm == true)
+            {
+                <MudItem xs="12" sm="3">
+                    <div Class="d-flex align-center justify-center mud-width-full py-8">
+                        <MudCard Style=" box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;" @onclick="()=>GetRecipeAbout(item.Id)">
+                            <MudImage Src="@($"https://localhost:7018/{item.Image}")" Fluid="true" ObjectFit="ObjectFit.ScaleDown" />
+                            <MudCardContent>
+                                <MudText Typo="Typo.body1">@item.RecipeName</MudText>
+                                <div Class="d-flex justify-space">
+                                    <MudText Typo="Typo.overline">@item.NumberofPerson- kişilik</MudText>
+                                    <MudDivider Vertical="true" FlexItem="true" />
+                                    <MudText Typo="Typo.overline">@item.PreparationTime dk  -Hazırlık</MudText>
+                                    <MudDivider Vertical="true" FlexItem="true" />
+                                    <MudText Typo="Typo.overline">@item.CookingTime dk-Pişirme</MudText>
+                                </div>
+
+                            </MudCardContent>
+                            <MudDivider />
+                            <MudCardActions>
+                                <MudAvatar Size="Size.Small">
+                                    <MudImage Src="./images/makarna-tarifleri.jpg"></MudImage>
+                                </MudAvatar>
+                                <MudText Typo="Typo.body1">@item.UserName</MudText>
+                            </MudCardActions>
+                        </MudCard>
+                    </div>
+                </MudItem>
+            }
+        }
+    }
+</MudGrid>
+@code {
+    List<RecipeDto> model = new();
+    protected override async Task OnInitializedAsync()
+    {
+        model = await recipeService.GetAll();
+    }
+    public async Task GetRecipeAbout(int id)
+    {
+        string Id = id.ToString();
+        NavigatonManager.NavigateTo($"/user/recipeAbout/{Id}", forceLoad: true);
+    }
+}
+
+

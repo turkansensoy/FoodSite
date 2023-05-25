@@ -1,4 +1,5 @@
 ﻿@page "/admin/categorylist"
+@layout AdminLayout
 @using FoodSiteMAUI.Data.Services.Abstract;
 @using Entities.Concrete;
 @using FoodSiteMAUI.Data;
@@ -64,7 +65,7 @@ else
         new BreadcrumbItem("AnaSayfa", href: "#", icon: Icons.Material.Filled.Home),
         new BreadcrumbItem("Kategoriler", href: null, disabled: true, icon:Icons.Material.Filled.Category)
     };
-    bool fixedheader = false;
+    bool fixedheader = true;
     private List<Category> list;
     protected override async Task OnInitializedAsync()
     {

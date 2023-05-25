@@ -1,0 +1,40 @@
+﻿@page "/user/Category"
+@using Entities.Concrete;
+@inject ICategoryService categoryService;
+@inject NavigationManager NavigatonManager;
+@if (categoryList == null)
+{
+    <p>yükleniyor</p>
+}
+else
+{
+    <MudGrid>
+        @foreach (var item in categoryList)
+        {
+            <MudItem xs="12" sm="3" Class="mt-4">
+                <MudGrid Spacing="1">
+                    <MudPaper Class="product-item" Elevation="3" Style="cursor:pointer;">
+                        <MudItem Class="mb-1" @onclick="()=>GetRecipeByCategory(item.Id)">
+                            <MudImage Src="@($"https://localhost:7018/{item.Image}")" Width="232" Height="170" Fluid="true" ObjectFit="ObjectFit.ScaleDown"></MudImage>
+                        </MudItem>
+                        <MudItem xs="12" Class="mx-2 my-1">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Href="@($"/user/recipeByCategory/{@item.Id}")">@item.CategoryName</MudButton>
+                        </MudItem>
+                    </MudPaper>
+                </MudGrid>
+            </MudItem>
+        }
+    </MudGrid>
+}
+@code {
+    List<Category> categoryList;
+    protected override async Task OnInitializedAsync()
+    {
+        categoryList = await categoryService.GetAll();
+    }
+    public async Task GetRecipeByCategory(int id)
+    {
+        string Id = id.ToString();
+        NavigatonManager.NavigateTo($"/user/recipeByCategory/{Id}", forceLoad: true);
+    }
+}

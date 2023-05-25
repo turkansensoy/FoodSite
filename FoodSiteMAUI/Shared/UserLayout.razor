@@ -1,0 +1,19 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+<MudLayout>
+    <AppBarPartial/>
+    <NavMenuUser />
+   <MudMainContent>
+        <MudContainer xs="12">
+            @Body
+        </MudContainer>
+   </MudMainContent>
+</MudLayout>
+@code {
+}
+

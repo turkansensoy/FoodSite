@@ -1,0 +1,15 @@
+﻿<MudAppBar Color="Color.Primary" Fixed="false" Dense="true">
+    <MudSpacer />
+    <MudMenu FullWidth="true" ActivationEvent="@MouseEvent.MouseOver">
+        <ActivatorContent>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">Hesap Numarası</MudButton>
+        </ActivatorContent>
+        <ChildContent>
+            <MudNavMenu Dense="true" Color="Color.Info" Width="250px">
+                <MudNavLink Href="/profil" Icon="@Icons.Material.Filled.Dashboard">Profilim</MudNavLink>
+                <MudNavLink Href="/admin" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Ayarlar</MudNavLink>
+                <MudNavLink Href="/about">Çıkış</MudNavLink>
+            </MudNavMenu>
+        </ChildContent>
+    </MudMenu>
+</MudAppBar>

@@ -60,8 +60,4 @@
       <ProjectReference Include="..\Entities\Entities.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Pages\User\" />
-    </ItemGroup>
-
 </Project>

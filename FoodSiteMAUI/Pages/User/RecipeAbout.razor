@@ -1,0 +1,87 @@
+﻿@page "/user/recipeAbout/{id}"
+@using Entities.Concrete;
+@using Entities.Dtos;
+@layout UserLayout
+@inject IRecipeService recipeService;
+@inject IMaterialService _materialService;
+
+@if (recipe != null && ListMultiSelectMaterial !=null)
+{
+    @if (recipe.IsConfirm == true)
+    {
+        <MudGrid>
+            <MudItem sm="6">
+                <MudText Typo="Typo.h5">@recipe.RecipeName Nasıl yapılır?</MudText>
+            </MudItem>
+        </MudGrid>
+        <MudItem>
+            <div Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudCard>
+                    <MudImage Src="@($"https://localhost:7018/{recipe.Image}")" Fluid="true" ObjectFit="ObjectFit.ScaleDown"></MudImage>
+                </MudCard>
+            </div>
+        </MudItem>
+        <MudItem>
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudAvatar Color="Color.Secondary">I</MudAvatar>
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.body1">@recipe.UserName</MudText>
+                        <MudText Typo="Typo.body2">@recipe.UserEmail</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudDivider Class="my-1" />
+                <br />
+                <MudCardContent>
+                    <MudItem>
+                        <MudGrid>
+                            <div Class="d-flex justify-start  flex-grow-1 gap-4">
+                                <MudText Disabled="true"><MudImage Src="./images/_meal.png" Height="35" Width="35" /> @recipe.NumberofPerson- kişilik</MudText>
+                                <MudDivider Vertical="true" FlexItem="true" />
+                                <MudText Class=".justify-md-center"><MudImage Src="./images/stopwatch.png" Height="30" Width="30" />@recipe.PreparationTime dk -Hazırlık,@recipe.CookingTime dk-Pişirme</MudText>
+                            </div>
+                        </MudGrid>
+                    </MudItem>
+                    <br />
+                    <MudItem sm="6" md="4">
+                        <MudText Typo="Typo.h6">Malzemeler</MudText>
+                    </MudItem>
+                    <MudList>
+                        @foreach (var item in ListMultiSelectMaterial)
+                        {
+                            <MudItem>
+                                <MudText Typo="Typo.body2"><MudImage Src="./images/stop.png" Height="25" Width="25" />@item.MaterialNumber @item.Guantity @item.MaterialName</MudText>
+                            </MudItem>
+                        }
+                    </MudList>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+        <br />
+        <MudItem>
+            <MudCard>
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6">Nasıl Yapılır?</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Typo="Typo.body2">@recipe.RecipeContent</MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+}
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+    Recipe recipe = new();
+    List<MultiSelectMaterialDto> ListMultiSelectMaterial = new();
+    protected override async Task OnInitializedAsync()
+    {
+        int Id = Convert.ToInt32(id);
+        recipe = await recipeService.GetById(Id);
+        ListMultiSelectMaterial = await _materialService.GetMultiSelectMaterial(Id);
+    }
+}

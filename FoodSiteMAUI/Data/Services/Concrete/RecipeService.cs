@@ -56,6 +56,13 @@ namespace FoodSiteMAUI.Data.Services.Concrete
             return await response.Content.ReadFromJsonAsync<Recipe>();
         }
 
+        public async Task<List<RecipeDto>> GetRecipeByCategoryId(int categoryId)
+        {
+         var  response= await _httpClient.GetAsync($"api/Recipes/getRecipeByCategoryId/{categoryId}");
+            response.EnsureSuccessStatusCode();
+           return await response.Content.ReadFromJsonAsync<List<RecipeDto>>();
+        }
+
         public async Task<List<RecipeEngineDto>> GetRecipeEngineDtos(int materialId)
         {
             var response= await _httpClient.GetAsync($"api/Recipes/getRecipeEngine/{materialId}");
