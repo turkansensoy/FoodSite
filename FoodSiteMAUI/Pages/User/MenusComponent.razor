@@ -1,0 +1,45 @@
+﻿@page "/user/menusComponent"
+@using Entities.Dtos;Menu
+@layout MainLayout
+@inject IMenuService _menuService;
+<MudGrid>
+    @foreach (var item in model)
+    {
+        <MudItem xs="12" sm="3">
+            <div Class="d-flex align-center justify-center mud-width-full py-8">
+                <MudCard Style=" box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;">
+                    <MudGrid Spacing="1">
+                        @{
+                            var count = 1;
+                        }
+                        @foreach (var item1 in item.MenuRecipeGetDtos)
+                        {
+                            @if (count<=4)
+                            {
+                                <MudItem sm="6" Class="pa-3">
+
+                                    <MudImage Src="@($"https://localhost:7018/{item1.Image}")" Fluid="true" ObjectFit="ObjectFit.ScaleDown" />
+                                </MudItem>
+                            }
+                            count++;
+                        }
+                    </MudGrid>
+                    <MudCardActions>
+                        <MudItem xs="12" Class="pa-4">
+                            <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Href="@($"/user/mutliRecipeMenu/{@item.Id}")">@item.MenuName</MudButton>
+                        </MudItem>
+                    </MudCardActions>
+                </MudCard>
+            </div>
+        </MudItem>
+    }
+</MudGrid>
+
+@code {
+    List<GetRecipeMenuDto> model = new();
+    protected override async Task OnInitializedAsync()
+    {
+        model = await _menuService.GetAllMenuRecipe();
+    }
+
+}

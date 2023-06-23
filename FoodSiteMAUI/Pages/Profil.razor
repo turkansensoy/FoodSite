@@ -1,0 +1,44 @@
+﻿@page "/profil"
+@layout AdminLayout
+
+<MudItem>
+    <MudCard>
+        <MudCardHeader>
+            <MudText Typo="Typo.h6">item.RecipeName</MudText>
+            <MudText Typo="Typo.subtitle2" Style="@($"color:{Colors.Red.Darken1};")">Taslak Tarif</MudText>
+        </MudCardHeader>
+        <MudDivider Class="my-2" />
+        <MudCardContent>
+            <MudGrid Class="d-flex align-start flex-grow-1 gap-4" Elevation="0">
+                <MudItem Class="py-2 d-flex flex-1" sm="6">
+                    <MudAvatar Size="Size.Medium">
+                        <MudImage Src="./images/makarna-tarifleri.jpg"></MudImage>
+                    </MudAvatar>
+                    <div>
+                        <MudText Typo="Typo.body1">Istra Croatia</MudText>
+                        <MudText Typo="Typo.body2">Peninsula in Europe</MudText>
+                    </div>
+                </MudItem>
+
+                <MudItem Class="py-2 d-flex flex-1 justify-end" sm="6">
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Class="justify-end">Düzenle</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudCardContent>
+    </MudCard>
+</MudItem>
+<MudDivider Class="my-2" />
+<MudTabs Elevation="1" Rounded="true" PanelClass="pa-6">
+    <MudTabPanel Text="Taslaklarım" Icon="@Icons.Material.Filled.Create" ToolTip="ToolTip One">
+        <SenderRecipe></SenderRecipe>
+        <br />
+    </MudTabPanel>
+    <MudTabPanel Text="Onaylanmayan Tariflerim" Icon="@Icons.Material.Filled.Repeat" ToolTip="ToolTip Two">
+        <NotConfirmComponent></NotConfirmComponent>
+    </MudTabPanel>
+</MudTabs>
+@code {
+
+}
+
+

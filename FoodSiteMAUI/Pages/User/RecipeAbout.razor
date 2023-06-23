@@ -5,6 +5,7 @@
 @inject IRecipeService recipeService;
 @inject IMaterialService _materialService;
 
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
 @if (recipe != null && ListMultiSelectMaterial !=null)
 {
     @if (recipe.IsConfirm == true)
@@ -78,6 +79,12 @@
     public string id { get; set; }
     Recipe recipe = new();
     List<MultiSelectMaterialDto> ListMultiSelectMaterial = new();
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("AnaSayfa", href: "#", icon: Icons.Material.Filled.Home),
+        new BreadcrumbItem("Kategoriler", href: "/user/Category",icon:Icons.Material.Filled.Category),
+        new BreadcrumbItem("Yemek tarifleri", href: null, disabled: true, icon:Icons.Material.Filled.Dining)
+    };
     protected override async Task OnInitializedAsync()
     {
         int Id = Convert.ToInt32(id);

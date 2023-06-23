@@ -1,0 +1,60 @@
+﻿@page "/register";
+@layout LoginUILayout;
+<br />
+<MudContainer MaxWidth="MaxWidth.Small" class="mt-16">
+    <MudCard class="mt-16 align-self-center" style="box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;">
+        <MudForm @ref="@form">
+            <MudCardHeader>
+                <div Class="d-flex justify-start">
+                    <MudTooltip Text="Geri Dön" Arrow="true" Placement="Placement.Bottom">
+                        <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Href="/" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" />
+                    </MudTooltip>
+                </div>
+            </MudCardHeader>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h5">Hesap Oluştur</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Hesabın var ise <MudLink Href="/login">Giriş yap</MudLink></MudText>
+                <br />
+
+                <MudTextField @bind-Value="TextValue" Label="Kullanıcı Adı" Variant="Variant.Outlined"></MudTextField>
+                <MudTextField @bind-Value="TextValue" Label="Email" Variant="Variant.Outlined"></MudTextField>
+                <MudTextField @bind-Value="Password" Label="Şifre" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
+            </MudCardContent>
+            <br />
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true">Kayıt ol</MudButton>
+            </MudCardActions>
+            <br />
+            <MudDivider Class="my-2" />
+            <br />
+        </MudForm>
+    </MudCard>
+</MudContainer>
+@code {
+    MudForm form;
+    public string TextValue { get; set; }
+    public string Password { get; set; } = "*****";
+    bool isShow;
+    InputType PasswordInput = InputType.Password;
+    string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+    void ButtonTestclick()
+    {
+        @if (isShow)
+        {
+            isShow = false;
+            PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
+            PasswordInput = InputType.Password;
+        }
+        else
+        {
+            isShow = true;
+            PasswordInputIcon = Icons.Material.Filled.Visibility;
+            PasswordInput = InputType.Text;
+        }
+    }
+}
+

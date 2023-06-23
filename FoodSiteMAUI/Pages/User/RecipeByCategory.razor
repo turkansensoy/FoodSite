@@ -1,12 +1,21 @@
 ﻿@page "/user/recipeByCategory/{id}"
+@using Entities.Concrete;
 @using Entities.Dtos;
 
 @inject IRecipeService recipeService;
+@inject ICategoryService _categoryService;
 @inject NavigationManager NavigatonManager;
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
 <MudGrid>
-    @if (recipeDtos !=null)
+    <MudItem sm="6" md="4">
+        <MudText Typo="Typo.h5">@category.CategoryName ile tarifler</MudText>
+    </MudItem>
+</MudGrid>
+<br />
+<MudGrid>
+    @if (recipeDtos != null)
     {
-       @foreach (var item in recipeDtos)
+        @foreach (var item in recipeDtos)
         {
             <MudItem xs="12" sm="3">
                 <div Class="d-flex align-center justify-center mud-width-full py-8">
@@ -40,14 +49,21 @@
     [Parameter]
     public string id { get; set; }
     List<RecipeDto> recipeDtos = new();
+    Category category=new();
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("Kategoriler", href: "/user/Category", icon: Icons.Material.Filled.Category),
+        new BreadcrumbItem("Yemek Tarifleri", href: null, disabled: true, icon:Icons.Material.Filled.FoodBank)
+    };
     protected override async Task OnInitializedAsync()
     {
         int Id = Convert.ToInt32(id);
-        recipeDtos= await recipeService.GetRecipeByCategoryId(Id);
+        category = await _categoryService.GetById(Id);
+        recipeDtos = await recipeService.GetRecipeByCategoryId(Id);
     }
-    public async Task GetRecipeAbout(int id)
+    public async Task GetRecipeAbout(int recipeId)
     {
-        string Id = id.ToString();
+        string Id = recipeId.ToString();
         NavigatonManager.NavigateTo($"/user/recipeAbout/{Id}", forceLoad: true);
     }
 }

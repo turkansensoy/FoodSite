@@ -2,13 +2,12 @@
     <MudSpacer />
     <MudMenu FullWidth="true" ActivationEvent="@MouseEvent.MouseOver">
         <ActivatorContent>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary">Hesap Numarası</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">Giriş Yap/Kayıt Ol</MudButton>
         </ActivatorContent>
         <ChildContent>
             <MudNavMenu Dense="true" Color="Color.Info" Width="250px">
-                <MudNavLink Href="/profil" Icon="@Icons.Material.Filled.Dashboard">Profilim</MudNavLink>
-                <MudNavLink Href="/admin" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Ayarlar</MudNavLink>
-                <MudNavLink Href="/about">Çıkış</MudNavLink>
+                <MudNavLink Href="/login" Icon="@Icons.Material.Filled.Dashboard">Giriş Yap</MudNavLink>
+                <MudNavLink Href="/register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">Kayıt ol</MudNavLink>
             </MudNavMenu>
         </ChildContent>
     </MudMenu>

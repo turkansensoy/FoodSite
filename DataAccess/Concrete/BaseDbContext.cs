@@ -15,6 +15,8 @@ namespace DataAccess.Concrete
         public DbSet<Recipe> Recipes { get; set; }
         public DbSet<RecipeMaterial> RecipeMaterials { get; set; }
         public DbSet<Material> Materials { get; set; }
+        public DbSet<Menu> Menu { get; set; }
+        public DbSet<RecipeMenu> RecipeMenu { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)

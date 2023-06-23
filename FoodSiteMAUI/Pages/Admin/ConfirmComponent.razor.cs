@@ -12,10 +12,10 @@ namespace FoodSiteMAUI.Pages.Admin
     public partial class ConfirmComponent
     {
         private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
-    {
-        new BreadcrumbItem("AnaSayfa", href: "#", icon: Icons.Material.Filled.Home),
-        new BreadcrumbItem("Tarif Onaylama", href: null, disabled: true, icon: Icons.Material.Filled.ChecklistRtl)
-    };
+        {
+            new BreadcrumbItem("AnaSayfa", href: "/admin", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem("Tarif Onaylama", href: null, disabled: true, icon: Icons.Material.Filled.ChecklistRtl)
+        };
 
         private static List<ComfirmRecipeDto> ConfirmRecipeDto;
         private MudTextField<string> multilineReference;

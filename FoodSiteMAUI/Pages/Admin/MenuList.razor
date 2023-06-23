@@ -1,0 +1,127 @@
+﻿@page "/menulist";
+@layout AdminLayout;
+@using Entities.Dtos;
+@inject IMenuService _menuService;
+
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+<MudDivider Class="my-1" />
+<br />
+<MudGrid>
+    <MudItem sm="6" md="4">
+        <MudText Typo="Typo.h5">Tarif Onaylama</MudText>
+    </MudItem>
+</MudGrid>
+<br />
+@if (MenuListGetRecipeMenuDto != null)
+{
+    <MudTable Items="@MenuListGetRecipeMenuDto" Hover="true" Breakpoint="Breakpoint.Sm">
+        <ColGroup>
+            <col style="width:300px;" />
+            <col style="width:100px;" />
+            <col />
+            <col style="width:100px;" />
+        </ColGroup>
+        <HeaderContent>
+            <MudTh></MudTh>
+            <MudTh>Etiket Adı</MudTh>
+            <MudTh></MudTh>
+            <MudTh>Durum</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd><MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => ShowBtnPress(context.Id))">@((context.ShowDetails == true) ? "Sakla" : "Göster") Detayları</MudButton></MudTd>
+            <MudTd DataLabel="Name">@context.MenuName</MudTd>
+            <MudTd></MudTd>
+            <MudTd DataLabel="Durum">
+                <MudButton StartIcon="@Icons.Material.Filled.Edit" Color="Color.Secondary" OnClick="@(()=> Update(context.Id))">Düzenlensin</MudButton>
+                <MudButton StartIcon="@Icons.Material.Filled.Edit" Color="Color.Secondary" OnClick="@(()=> Delete(context.Id))">Düzenlensin</MudButton>
+            </MudTd>
+        </RowTemplate>
+        <ChildRowContent>
+            @if (context.ShowDetails)
+            {
+                <MudTr>
+                    <td colspan="4">
+                        <MudForm>
+                            <MudCard Elevation="0">
+                                <MudCardContent>
+                                    @*<MudItem><MudText Typo="Typo.inherit"> <strong>Malzemeler</strong></MudText></MudItem>*@
+                                    <MudTable Items="@context.MenuRecipeGetDtos" Context="AddressContext" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="0">
+                                        <ColGroup>
+                                            <col />
+                                            <col />
+                                            <col style="width:200px;" />
+                                        </ColGroup>
+                                        <HeaderContent>
+                                            <MudTh>Tarif Adı</MudTh>
+                                            <MudTh>Yapan Kişi</MudTh>
+                                        </HeaderContent>
+                                        <RowTemplate>
+                                            <MudTd DataLabel="Tarif Adı">@AddressContext.RecipeName</MudTd>
+                                            <MudTd DataLabel="Yapan Kişi">@AddressContext.UserName</MudTd>
+                                        </RowTemplate>
+                                    </MudTable>
+                                </MudCardContent>
+                            </MudCard>
+                        </MudForm>
+                    </td>
+                </MudTr>
+            }
+        </ChildRowContent>
+    </MudTable>
+}
+@code {
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+            new BreadcrumbItem("AnaSayfa", href: "/admin", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem("Tarif Onaylama", href: null, disabled: true, icon: Icons.Material.Filled.ChecklistRtl)
+    };
+    private static List<MenuListGetRecipeMenuDto> MenuListGetRecipeMenuDto;
+    private MudTextField<string> multilineReference;
+    protected async override void OnInitialized()
+    {
+        FillConfirmRecipeDto();
+    }
+    private void ShowBtnPress(int nr)
+    {
+        MenuListGetRecipeMenuDto tmpPerson = MenuListGetRecipeMenuDto.First(f => f.Id == nr);
+        tmpPerson.ShowDetails = !tmpPerson.ShowDetails;
+    }
+    private async void FillConfirmRecipeDto()
+    {
+        List<MenuListGetRecipeMenuDto> AddComfirmRecipeDto = new List<MenuListGetRecipeMenuDto>();
+        var result = await _menuService.GetAllMenuRecipe();
+        foreach (var item in result)
+        {
+            MenuListGetRecipeMenuDto menuListGetRecipeMenuDto = new MenuListGetRecipeMenuDto()
+                {
+                    Id = item.Id,
+                    MenuName = item.MenuName,
+                    ShowDetails = false
+                };
+
+            menuListGetRecipeMenuDto.MenuRecipeGetDtos= new List<MenuRecipeGetDto>();
+            foreach (var item1  in item.MenuRecipeGetDtos)
+            {
+                MenuRecipeGetDto menuRecipeGetDto = new()
+                    {
+                        Image=item1.Image,
+                        MenuId= item1.MenuId,
+                        RecipeId= item1.RecipeId,
+                        RecipeName= item1.RecipeName,
+                        UserName= item1.UserName
+                    };
+                menuListGetRecipeMenuDto.MenuRecipeGetDtos.Add(menuRecipeGetDto);
+            }
+            AddComfirmRecipeDto.Add(menuListGetRecipeMenuDto);
+            MenuListGetRecipeMenuDto = AddComfirmRecipeDto;
+        }
+    }
+    private async Task Update(int id)
+    {
+
+    }
+    private async Task Delete(int id)
+    {
+        
+    }
+}

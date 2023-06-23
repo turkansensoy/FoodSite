@@ -1,0 +1,133 @@
+﻿@page "/addMenuList"
+@using Entities.Dtos;
+@layout AdminLayout
+@inject IRecipeService _recipeService;
+@inject IMenuService _menuService;
+@inject ISnackbar Snackbar;
+<MudBreadcrumbs Items="_items"></MudBreadcrumbs>
+<MudDivider Class="my-1" />
+<br />
+<MudGrid>
+    <MudItem sm="6" md="4">
+        <MudText Typo="Typo.h5">Etiket Bilgisi</MudText>
+    </MudItem>
+</MudGrid>
+<br />
+<MudContainer>
+    <MudCard>
+        <MudCardContent>
+            <MudForm Model="@model" @ref="@form">
+                <MudTextField @bind-Value="model.MenuName"
+                              Immediate="true"
+                              Label="Menü Adı" />
+
+                <MudAutocomplete T=RecipeEngineDto Label="Tarif" @bind-Value="selectRecipe" SearchFunc="@Search1"
+                                 ToStringFunc=DisplayValue
+                                 AdornmentColor="Color.Primary" />
+            </MudForm>
+            <br />
+            @if (AddSelectRecipe != null)
+            {
+                <MudSimpleTable Hover="true" Dense="true">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Tarif Adı</th>
+                            <th>Durum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            var currentCount = 1;
+                        }
+                        @foreach (var item in AddSelectRecipe)
+                        {
+                            <tr>
+                                <td>@currentCount</td>
+                                <td>@item.RecipeName</td>
+                                <td>
+                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Medium" OnClick="()=> DeleteItemRecipe(item.Id)" />
+                                </td>
+                            </tr>
+                            currentCount++;
+                        }
+                    </tbody>
+                </MudSimpleTable>
+            }
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await AddRecipe())">Tarif Ekle</MudButton>
+        </MudCardActions>
+    </MudCard>
+    <MudItem>
+        <br />
+        <div Class="d-flex justify-end">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class=" justify-end" OnClick="@(async () => await Submit())">Kaydet</MudButton>
+        </div>
+    </MudItem>
+</MudContainer>
+
+@code {
+    MudForm form;
+    RecipeMenuDto model = new();
+    List<RecipeEngineDto> listRecipe = new();
+    RecipeEngineDto selectRecipe = new();
+    List<RecipeEngineDto> AddSelectRecipe = new();
+    private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
+    {
+        new BreadcrumbItem("AnaSayfa", href: "/admin", icon: Icons.Material.Filled.Home),
+        new BreadcrumbItem("Kategoriler", href: "/admin/categorylist", icon: Icons.Material.Filled.Category),
+        new BreadcrumbItem("Yeni Etiket", href: null, disabled: true, icon: Icons.Material.Filled.Create)
+    };
+    protected override async Task OnInitializedAsync()
+    {
+        listRecipe= await _recipeService.GetAllRecipeEngine();
+    }
+    async Task<IEnumerable<RecipeEngineDto>> Search1(string value)
+    {
+        await Task.Yield();
+
+        if (!string.IsNullOrWhiteSpace(value))
+            return listRecipe.Where(item => item.RecipeName.ToLower().Contains(value.ToLower())) ?? listRecipe;
+        return listRecipe;
+    }
+    private Func<RecipeEngineDto, string?> DisplayValue = item => item is null ? null : item.RecipeName;
+    private async Task AddRecipe()
+    {
+        var result= AddSelectRecipe.Exists(_=>_.Id== selectRecipe.Id);
+        if (result ==false)
+        {
+            AddSelectRecipe.Add(selectRecipe);
+            selectRecipe = new() { Id = 0, RecipeName = "" };
+        }
+        selectRecipe = new() { Id = 0, RecipeName = "" };
+    }
+    private async Task DeleteItemRecipe(int id)
+    {
+        var result= AddSelectRecipe.Find(_=>_.Id== id);
+        AddSelectRecipe.Remove(result);
+    }
+    private async Task Submit()
+    {
+        if (AddSelectRecipe.Count <3)
+        {
+            Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+            Snackbar.Add("En az 4 tane tarif olmalıdır.",Severity.Error);
+        }
+        else
+        {
+            model.Recipes = new List<RecipeIdMenuDto>();
+            foreach (var item in AddSelectRecipe)
+            {
+                RecipeIdMenuDto recipeIdMenuDto = new()
+                    {
+                        RecipeId = item.Id
+                    };
+                model.Recipes.Add(recipeIdMenuDto);
+            }
+            _menuService.Add(model);
+        }
+       
+    }
+
+}

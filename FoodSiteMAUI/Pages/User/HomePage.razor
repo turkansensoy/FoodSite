@@ -4,6 +4,12 @@
 @inject IRecipeService recipeService;
 @inject NavigationManager NavigatonManager;
 <MudGrid>
+    <MudItem sm="6" md="4">
+        <MudText Typo="Typo.h5">Yemek Tarifleri</MudText>
+    </MudItem>
+</MudGrid>
+<br />
+<MudGrid>
     @if (model != null)
     {
         @foreach (var item in model)

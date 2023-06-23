@@ -27,6 +27,10 @@ namespace Business
             services.AddSingleton<IMaterialService, MaterialManager>();
             services.AddSingleton<IMaterialRepository, MaterialRepository>();
 
+            services.AddSingleton<IMenuRepository, MenuRepository>();
+            services.AddSingleton<IMenuService, MenuManager>();
+            services.AddSingleton<IRecipeMenuService, RecipeMenuManager>();
+            services.AddSingleton<IRecipeMenuRepository, RecipeMenuRepository>();
             return services;
         }
     }

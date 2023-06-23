@@ -20,7 +20,7 @@ namespace FoodSiteMAUI.Pages
         RecipeMaterialAddDto model = new RecipeMaterialAddDto();
         private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
-            new BreadcrumbItem("Home", href: "#", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem("Home", href: "/admin", icon: Icons.Material.Filled.Home),
             new BreadcrumbItem("Taslak Tariflerim", href: "/senderRecipe", icon: Icons.Material.Filled.VideoLibrary),
             new BreadcrumbItem("Yeni Tarif", href: null, disabled: true, icon: Icons.Material.Filled.Create)
         };
@@ -121,36 +121,45 @@ namespace FoodSiteMAUI.Pages
             {
                 model.Image = _imageBase64Data;
             }
-            RecipeMaterialAddDto recipeMaterialAdd = new()
+            if (model.Image == null)
             {
-                RecipeName = model.RecipeName,
-                RecipeContent = model.RecipeContent,
-                Image = model.Image,
-                NumberofPerson = model.NumberofPerson,
-                PreparationTime = model.PreparationTime,
-                CookingTime = model.CookingTime,
-                UserName = model.UserName,
-                UserEmail = model.UserEmail,
-                RecipeDateTime = DateTime.Now,
-                IsConfirm = false,
-                IsSend = false,
-                CategoryId = model.CategoryId
-            };
-
-            recipeMaterialAdd.recipeMaterialDtos = new List<RecipeMaterialDto>();
-            foreach (var item in ListMultiSelectMaterial)
-            {
-                RecipeMaterialDto recipeMaterial = new()
-                {
-                    MaterialId = item.MaterialId,
-                    Guantity = item.Guantity,
-                    MaterialNumber = item.MaterialNumber
-                };
-                recipeMaterialAdd.recipeMaterialDtos.Add(recipeMaterial);
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add("Resim ekleyiniz.", Severity.Error);
             }
+            else
+            {
+                RecipeMaterialAddDto recipeMaterialAdd = new()
+                {
+                    RecipeName = model.RecipeName,
+                    RecipeContent = model.RecipeContent,
+                    Image = model.Image,
+                    NumberofPerson = model.NumberofPerson,
+                    PreparationTime = model.PreparationTime,
+                    CookingTime = model.CookingTime,
+                    UserName = model.UserName,
+                    UserEmail = model.UserEmail,
+                    RecipeDateTime = DateTime.Now,
+                    IsConfirm = false,
+                    IsSend = false,
+                    CategoryId = model.CategoryId
+                };
 
-            await _recipeService.Add(recipeMaterialAdd);
-            NavigatonManager.NavigateTo("/senderRecipe", forceLoad: true);
+                recipeMaterialAdd.recipeMaterialDtos = new List<RecipeMaterialDto>();
+                foreach (var item in ListMultiSelectMaterial)
+                {
+                    RecipeMaterialDto recipeMaterial = new()
+                    {
+                        MaterialId = item.MaterialId,
+                        Guantity = item.Guantity,
+                        MaterialNumber = item.MaterialNumber
+                    };
+                    recipeMaterialAdd.recipeMaterialDtos.Add(recipeMaterial);
+                }
+
+                await _recipeService.Add(recipeMaterialAdd);
+                NavigatonManager.NavigateTo("/senderRecipe", forceLoad: true);
+            }
+            
         }
         private async void DisplayAction()
         {

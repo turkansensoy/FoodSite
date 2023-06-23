@@ -5,6 +5,7 @@
 
 @inject ICategoryService _categoryService;
 @inject NavigationManager NavigatonManager;
+@inject ISnackbar Snackbar;
 <MudBreadcrumbs Items="_items"></MudBreadcrumbs>
 <MudDivider Class="my-1" />
 <br />
@@ -42,7 +43,7 @@
     CategoryValidator CategoryValidator = new();
     private List<BreadcrumbItem> _items = new List<BreadcrumbItem>
         {
-            new BreadcrumbItem("AnaSayfa", href: "#", icon: Icons.Material.Filled.Home),
+            new BreadcrumbItem("AnaSayfa", href: "/admin", icon: Icons.Material.Filled.Home),
             new BreadcrumbItem("Kategoriler", href: "/admin/categorylist", icon: Icons.Material.Filled.Category),
             new BreadcrumbItem("Yeni Kategori", href: null, disabled: true, icon: Icons.Material.Filled.Create)
         };
@@ -54,12 +55,21 @@
         await form.Validate();
         if (form.IsValid)
         {
+
             if (!string.IsNullOrWhiteSpace(_imageBase64Data))
             {
                 model.Image = _imageBase64Data;
             }
-            await _categoryService.Add(model);
-            NavigatonManager.NavigateTo("/admin/categorylist/", forceLoad: true);
+            if (model.Image == null)
+            {
+                Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
+                Snackbar.Add("Resim ekleyiniz.", Severity.Error);
+            }
+            else
+            {
+                await _categoryService.Add(model);
+                NavigatonManager.NavigateTo("/admin/categorylist/", forceLoad: true);
+            }
         }
 
     }
